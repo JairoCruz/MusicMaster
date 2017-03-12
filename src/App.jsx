@@ -9,7 +9,8 @@ class App extends Component {
 		super(props);
 		this.state = {
 			query: '',
-			artist: null
+			artist: null,
+			tracks: []
 		}
 	}
 
@@ -18,7 +19,7 @@ class App extends Component {
 		console.log('this.state', this.state);
 		const BASE_URL = 'https://api.spotify.com/v1/search?';
 		const FETCH_URL = `${BASE_URL}q=${this.state.query}&type=artist&limit=1`;
-		console.log('FECH_URL', FETCH_URL);
+		const ALBUM_URL = 'https://api.spotify.com/v1/artists/';
 
 		fetch(FETCH_URL, {
 			method: 'GET'
@@ -26,11 +27,23 @@ class App extends Component {
 		.then(response => response.json())
 		.then(json => {
 			const artist = json.artists.items[0];
-			console.log('artist', artist);
-			this.setState({
-				artist
+			this.setState({	artist });
+
+
+			const FETCH_URL_ALBUM = `${ALBUM_URL}${artist.id}/top-tracks?country=US&`
+			fetch(FETCH_URL_ALBUM,{
+				method: 'GET'
+			})
+			.then(response => response.json())
+			.then(json => {
+				console.log('artist top tracks:', json);
+				const { tracks } = json;
+				this.setState({ tracks });
 			});
 		});
+
+
+		
 	}
 
 	render() {
@@ -56,11 +69,17 @@ class App extends Component {
 						</InputGroup.Addon>
 					</InputGroup>
 				</FormGroup>
-				<Profile
-				artist={ this.state.artist } />
-				<div className="Gallery">
-					Gallery
-				</div>
+				{
+					this.state.artist !== null ?
+						<div>
+							<Profile
+								artist={ this.state.artist } />
+							<div className="Gallery">
+								Gallery
+							</div>
+						</div>
+					: <div></div>
+				}
 			</div>
 			)
 	}
