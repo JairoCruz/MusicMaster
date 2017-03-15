@@ -3,9 +3,50 @@ import './App.css';
 
 class Gallery extends Component {
 
+	constructor(props) {
+		super(props);
+		this.state = {
+			playingUrl: '',
+			audio: null,
+			playing: false,
+			pause: false
+		}
+	}
+
 	playAudio(previewUrl) {
 		let audio = new Audio(previewUrl);
-		audio.play();
+		if(!this.state.playing & !this.state.pause) {
+			audio.play();
+			this.setState({
+				playing: true,
+				playingUrl: previewUrl,
+				audio
+			});	
+		} else {
+			if (this.state.playingUrl === previewUrl & this.state.pause === true) {
+				this.state.audio.play();
+				this.setState({
+					playing: true,
+					pause: false
+				});
+			} else if (this.state.playingUrl === previewUrl & this.state.pause === false) {
+				this.state.audio.pause();
+				this.setState({
+					playing: false,
+					pause: true
+				});
+			} else {
+				this.state.audio.pause();
+				audio.play();
+				this.setState({
+					playing: true,
+					pause: false,
+					playingUrl: previewUrl,
+					audio
+				});
+			}
+		}
+		
 	}
 
 	render() {
@@ -15,7 +56,7 @@ class Gallery extends Component {
 			<div>
 				{
 					tracks.map((track, k) => {
-						console.log('track', track);
+						// console.log('track', track);
 						const trackImg = track.album.images[0].url;
 						return(
 							<div key={k} className="track" onClick={() => this.playAudio(track.preview_url) } >
